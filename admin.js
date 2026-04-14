@@ -57,7 +57,7 @@ function renderAdminUI() {
     <style>
       #admin-bar {
         position: fixed;
-        bottom: 24px;
+        bottom: 80px;
         right: 24px;
         z-index: 5000;
       }
