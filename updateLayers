@@ -95,7 +95,16 @@ const customIcons = {
         iconAnchor: [17, 46],
         shadowAnchor: [12, 41],
         popupAnchor: [1, -40]
-    })
+    }),
+    religious: L.icon({
+    iconUrl: 'images/religious.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+    iconSize: [35, 46],
+    shadowSize: [41, 41],
+    iconAnchor: [17, 46],
+    shadowAnchor: [12, 41],
+    popupAnchor: [1, -40]
+})
 };
 
 // Create category layer group mapping
@@ -104,7 +113,8 @@ const categoryMap = {
     youth: youth,
     innovation: innovation,
     environmental: environmental,
-    education: education
+    education: education,
+    religious: religious
 };
 
 // Category-specific gradients
@@ -113,7 +123,8 @@ const categoryGradients = {
     youth: 'linear-gradient(135deg, #fb923c, #f59e0b)',
     innovation: 'linear-gradient(135deg, #c95444, #ca3d2a)',
     environmental: 'linear-gradient(135deg, #34d399, #10b981)',
-    education: 'linear-gradient(135deg, #ba3eeb, #b325eb)'
+    education: 'linear-gradient(135deg, #ba3eeb, #b325eb)',
+    religious: 'linear-gradient(135deg, #f59e0b, #d97706)'
 };
 
 // Category-specific icon colors
@@ -122,7 +133,8 @@ const categoryIconColors = {
     youth: '#f59e0b',
     innovation: '#ca3d2a',
     environmental: '#10b981',
-    education: '#b325eb'
+    education: '#b325eb',
+    religious: '#d97706'
 };
 
 // Add a single event marker to the map
@@ -275,6 +287,7 @@ youth.addTo(map);
 innovation.addTo(map);
 environmental.addTo(map);
 education.addTo(map);
+religious.addTo(map);
 
 // Filter control
 var filterControl = L.control({ position: 'topleft' });
@@ -287,6 +300,7 @@ filterControl.onAdd = function(map) {
         <label class="filter-innovation"><input type="checkbox" id="innovationCheckbox" checked> Innovation</label>
         <label class="filter-environmental"><input type="checkbox" id="environmentalCheckbox" checked> Environmental</label>
         <label class="filter-education"><input type="checkbox" id="educationCheckbox" checked> Education</label>
+        <label class="filter-religious"><input type="checkbox" id="religiousCheckbox" checked> Religious</label>
     `;
     L.DomEvent.disableClickPropagation(div);
     return div;
@@ -321,10 +335,15 @@ function updateLayers() {
     } else {
         map.removeLayer(education);
     }
+    if (document.getElementById('religiousCheckbox').checked) {
+    map.addLayer(religious);
+    } else {
+    map.removeLayer(religious);
+    }
 }
 
 // Add event listeners for checkboxes
-['political', 'youth', 'innovation', 'environmental', 'education'].forEach(id => {
+['political', 'youth', 'innovation', 'environmental', 'education', 'religious'].forEach(id => {
     document.getElementById(id + 'Checkbox').addEventListener('change', updateLayers);
 });
 
@@ -349,6 +368,7 @@ window.refreshMapMarkers = function() {
   innovation.clearLayers();
   environmental.clearLayers();
   education.clearLayers();
+  religious.clearLayers();
 
   // Re-add all markers from current eventsData
   window.eventsData.forEach(event => addMarker(event));
