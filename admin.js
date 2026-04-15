@@ -467,12 +467,15 @@ window.saveAdminEvent = async function() {
     }
 
   window.closeAdminModal();
-    if (typeof renderEvents === 'function') {
-      renderEvents(window.currentFilter || 'all');
-      // Wait for DOM to update then re-add admin buttons
-      setTimeout(() => addAdminButtonsToCards(), 100);
-    }
-    alert(editingId ? '✅ Event updated!' : '✅ Event added!');
+if (typeof renderEvents === 'function') {
+  renderEvents(window.currentFilter || 'all');
+  setTimeout(() => addAdminButtonsToCards(), 100);
+}
+// ✅ Update map if on map page
+if (typeof refreshMapMarkers === 'function') {
+  refreshMapMarkers();
+}
+alert(editingId ? '✅ Event updated!' : '✅ Event added!');
   } catch (err) {
     console.error('Error saving event:', err);
     alert('Error saving event: ' + err.message);
@@ -496,13 +499,16 @@ window.confirmDeleteEvent = async function() {
     if (window.eventsData) {
       window.eventsData = window.eventsData.filter(e => e.id !== deletingId);
     }
-    window.closeDeleteConfirm();
-    if (typeof renderEvents === 'function') {
-      renderEvents(window.currentFilter || 'all');
-      // Wait for DOM to update then re-add admin buttons
-      setTimeout(() => addAdminButtonsToCards(), 100);
-    }
-    alert('🗑️ Event deleted.');
+ window.closeDeleteConfirm();
+if (typeof renderEvents === 'function') {
+  renderEvents(window.currentFilter || 'all');
+  setTimeout(() => addAdminButtonsToCards(), 100);
+}
+// ✅ Update map if on map page
+if (typeof refreshMapMarkers === 'function') {
+  refreshMapMarkers();
+}
+alert('🗑️ Event deleted.');
   } catch (err) {
     console.error('Error deleting event:', err);
     alert('Error: ' + err.message);
