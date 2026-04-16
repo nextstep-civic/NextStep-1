@@ -78,7 +78,25 @@ function markEventCompleted(eventId) {
         }
         saveUserProgress(userProgress);
     }
-    
+    // Save progress to Firestore so it appears on the leaderboard
+try {
+  const { getFirestore, doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+  const { getAuth } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
+  const auth = getAuth();
+  const user = auth.currentUser;
+  if (user) {
+    const db = getFirestore();
+    await setDoc(doc(db, 'userProgress', user.uid), {
+      displayName: user.displayName || user.email.split('@')[0],
+      photoURL: user.photoURL || null,
+      eventsAttended: userProgress.eventsAttended || 0,
+      badgesEarned: userProgress.badgesEarned || 0,
+      volunteeredHours: userProgress.volunteeredHours || 0
+    }, { merge: true });
+  }
+} catch (e) {
+  console.warn('Could not sync progress to Firestore:', e);
+}
     renderEvents(currentFilter);
 }
 
