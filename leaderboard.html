@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="See who's leading the civic engagement movement in Boca Raton. Top community members ranked by events attended, badges earned, and volunteer hours." />
+    <meta name="author" content="NextStep" />
+    <link rel="canonical" href="https://nextstep-civic.org/leaderboard.html" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="manifest" href="site.webmanifest">
+
+    <link rel="stylesheet" href="style.css" type="text/css"/>
+    <link rel="stylesheet" href="dark-mode.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <title>Leaderboard – NextStep</title>
+
+    <style>
+      /* ── Page shell ── */
+      .leaderboard-main {
+        min-height: 100vh;
+        padding: 100px 20px 60px;
+        background: linear-gradient(160deg, #f0f4ff 0%, #e8eeff 50%, #f5f0ff 100%);
+      }
+
+      .leaderboard-inner {
+        max-width: 860px;
+        margin: 0 auto;
+      }
+
+      /* ── Header ── */
+      .lb-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+      }
+
+      .lb-header h1 {
+        font-size: clamp(2rem, 5vw, 3rem);
+        font-weight: 800;
+        color: rgb(1, 9, 67);
+        margin: 0 0 0.5rem;
+        letter-spacing: -0.5px;
+      }
+
+      .lb-header p {
+        color: #64748b;
+        font-size: 1.05rem;
+      }
+
+      .lb-trophy {
+        font-size: 3rem;
+        display: block;
+        margin-bottom: 0.5rem;
+        animation: trophyBounce 2s ease-in-out infinite;
+      }
+
+      @keyframes trophyBounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+      }
+
+      /* ── Tab switcher ── */
+      .lb-tabs {
+        display: flex;
+        gap: 8px;
+        background: white;
+        padding: 6px;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(37, 99, 235, 0.1);
+        margin-bottom: 2rem;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .lb-tabs::-webkit-scrollbar { display: none; }
+
+      .lb-tab {
+        flex: 1;
+        min-width: 130px;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 12px;
+        background: transparent;
+        font-family: 'Open Sans', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        white-space: nowrap;
+      }
+
+      .lb-tab:hover {
+        background: #f1f5f9;
+        color: rgb(1, 9, 67);
+      }
+
+      .lb-tab.active {
+        background: linear-gradient(135deg, #2563eb, #3b82f6);
+        color: white;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+      }
+
+      /* ── Podium (top 3) ── */
+      .lb-podium {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 2rem;
+      }
+
+      .podium-card {
+        flex: 1;
+        max-width: 200px;
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem 1rem 1rem;
+        text-align: center;
+        box-shadow: 0 8px 30px rgba(37, 99, 235, 0.1);
+        position: relative;
+        transition: transform 0.3s ease;
+        animation: podiumRise 0.6s ease both;
+      }
+
+      .podium-card:hover { transform: translateY(-4px); }
+
+      .podium-card.rank-1 {
+        order: 2;
+        padding-top: 2rem;
+        box-shadow: 0 12px 40px rgba(37, 99, 235, 0.18);
+        border: 2px solid #fbbf24;
+        animation-delay: 0.1s;
+      }
+
+      .podium-card.rank-2 {
+        order: 1;
+        animation-delay: 0.2s;
+      }
+
+      .podium-card.rank-3 {
+        order: 3;
+        animation-delay: 0.3s;
+      }
+
+      @keyframes podiumRise {
+        from { opacity: 0; transform: translateY(30px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      .podium-crown {
+        position: absolute;
+        top: -18px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 28px;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+      }
+
+      .podium-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2563eb, #3b82f6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        font-weight: 800;
+        color: white;
+        margin: 0 auto 0.75rem;
+        overflow: hidden;
+      }
+
+      .podium-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .podium-card.rank-1 .podium-avatar {
+        width: 72px;
+        height: 72px;
+        font-size: 26px;
+        border: 3px solid #fbbf24;
+      }
+
+      .podium-rank-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 800;
+        color: white;
+      }
+
+      .rank-1 .podium-rank-badge { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+      .rank-2 .podium-rank-badge { background: linear-gradient(135deg, #94a3b8, #cbd5e1); }
+      .rank-3 .podium-rank-badge { background: linear-gradient(135deg, #d97706, #f59e0b); }
+
+      .podium-name {
+        font-size: 14px;
+        font-weight: 700;
+        color: rgb(1, 9, 67);
+        margin-bottom: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .podium-score {
+        font-size: 22px;
+        font-weight: 800;
+        color: #2563eb;
+      }
+
+      .podium-score-label {
+        font-size: 11px;
+        color: #94a3b8;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      /* ── Rest of list ── */
+      .lb-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .lb-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background: white;
+        border-radius: 14px;
+        padding: 14px 18px;
+        box-shadow: 0 2px 12px rgba(37, 99, 235, 0.06);
+        transition: all 0.25s ease;
+        animation: rowFadeIn 0.4s ease both;
+        cursor: default;
+      }
+
+      .lb-row:hover {
+        transform: translateX(4px);
+        box-shadow: 0 4px 20px rgba(37, 99, 235, 0.12);
+      }
+
+      @keyframes rowFadeIn {
+        from { opacity: 0; transform: translateX(-16px); }
+        to   { opacity: 1; transform: translateX(0); }
+      }
+
+      .lb-row-rank {
+        font-size: 15px;
+        font-weight: 800;
+        color: #94a3b8;
+        min-width: 30px;
+        text-align: center;
+      }
+
+      .lb-row-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2563eb, #3b82f6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: 800;
+        color: white;
+        flex-shrink: 0;
+        overflow: hidden;
+      }
+
+      .lb-row-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .lb-row-info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .lb-row-name {
+        font-size: 15px;
+        font-weight: 700;
+        color: rgb(1, 9, 67);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .lb-row-sub {
+        font-size: 12px;
+        color: #94a3b8;
+        font-weight: 500;
+      }
+
+      .lb-row-score {
+        font-size: 18px;
+        font-weight: 800;
+        color: #2563eb;
+        text-align: right;
+      }
+
+      .lb-row-score-label {
+        font-size: 11px;
+        color: #94a3b8;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        text-align: right;
+      }
+
+      /* ── "You" highlight ── */
+      .lb-row.is-me,
+      .podium-card.is-me {
+        border: 2px solid #2563eb;
+        background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      }
+
+      .lb-row.is-me .lb-row-name::after,
+      .podium-card.is-me .podium-name::after {
+        content: ' (You)';
+        color: #2563eb;
+        font-size: 12px;
+      }
+
+      /* ── Loading / Empty states ── */
+      .lb-loading, .lb-empty {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #94a3b8;
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      .lb-loading i { font-size: 2rem; margin-bottom: 1rem; display: block; animation: spin 1s linear infinite; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+
+      .lb-empty i { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+
+      /* ── Last updated ── */
+      .lb-footer {
+        text-align: center;
+        margin-top: 2rem;
+        font-size: 12px;
+        color: #cbd5e1;
+        font-weight: 500;
+      }
+
+      /* ── Mobile ── */
+      @media (max-width: 600px) {
+        .lb-podium { gap: 8px; }
+        .podium-card { padding: 1.2rem 0.75rem 0.75rem; }
+        .podium-score { font-size: 18px; }
+        .lb-tabs { gap: 4px; }
+        .lb-tab { min-width: 100px; font-size: 12px; padding: 9px 10px; }
+      }
+    </style>
+  </head>
+  <body>
+
+  <!-- Navbar -->
+  <nav>
+    <div class="navbar">
+      <div class="navdiv">
+        <div class="logo">
+          <a href="index.html">
+            <img src="images/logo.png" alt="NextStep Logo" class="logo-image">
+          </a>
+        </div>
+        <nav class="nav-links">
+          <ul>
+            <li class="navbar-item"><a href="index.html">Home</a></li>
+            <li class="navbar-item"><a href="map.html">Map</a></li>
+            <li class="navbar-item"><a href="events.html">Events</a></li>
+            <li class="navbar-item"><a href="chatbot.html">Compass</a></li>
+            <li class="navbar-item"><a href="badges.html">Badges</a></li>
+            <li class="navbar-item"><a href="leaderboard.html" class="active">Leaderboard</a></li>
+            <li class="navbar-item"><a href="contact.html">Contact Us</a></li>
+          </ul>
+        </nav>
+        <div class="nav-right">
+          <li class="navbar-item"><a href="login.html" class="login">Login</a></li>
+          <li class="navbar-item"><a href="signup.html" class="signup">Sign Up</a></li>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="leaderboard-main">
+    <div class="leaderboard-inner">
+
+      <!-- Header -->
+      <div class="lb-header">
+        <span class="lb-trophy">🏆</span>
+        <h1>Community Leaderboard</h1>
+        <p>Boca Raton's most engaged civic champions</p>
+      </div>
+
+      <!-- Tab switcher -->
+      <div class="lb-tabs">
+        <button class="lb-tab active" data-tab="combined" onclick="switchTab('combined', this)">
+          <i class="fas fa-star"></i> Combined Score
+        </button>
+        <button class="lb-tab" data-tab="events" onclick="switchTab('events', this)">
+          <i class="fas fa-calendar-check"></i> Events Attended
+        </button>
+        <button class="lb-tab" data-tab="badges" onclick="switchTab('badges', this)">
+          <i class="fas fa-trophy"></i> Badges Earned
+        </button>
+        <button class="lb-tab" data-tab="hours" onclick="switchTab('hours', this)">
+          <i class="fas fa-clock"></i> Volunteer Hours
+        </button>
+      </div>
+
+      <!-- Podium -->
+      <div id="lb-podium" class="lb-podium">
+        <div class="lb-loading"><i class="fas fa-spinner"></i>Loading leaderboard…</div>
+      </div>
+
+      <!-- Rest of list -->
+      <div id="lb-list" class="lb-list"></div>
+
+      <div class="lb-footer" id="lb-footer"></div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer-grid">
+        <div class="footer-section footer-about">
+          <h3>NEXTSTEP</h3>
+          <p>Empowering communities through civic engagement. Discover local events, connect with your neighbors, and make a real difference in Boca Raton.</p>
+          <div class="social-links">
+            <a href="#" class="social-link" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-link" aria-label="X (Twitter)"><i class="fab fa-x-twitter"></i></a>
+            <a href="#" class="social-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-link" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <div class="footer-section">
+          <h4>Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="map.html">Map</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="chatbot.html">Compass</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Resources</h4>
+          <ul class="footer-links">
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">FAQs</a></li>
+            <li><a href="#">Volunteer</a></li>
+            <li><a href="#">Partners</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Stay Updated</h4>
+          <p style="opacity:0.5;font-size:0.95rem;margin-bottom:1rem;">Subscribe for the latest civic events and opportunities.</p>
+          <form class="newsletter-form" onsubmit="event.preventDefault();">
+            <input type="email" class="newsletter-input" placeholder="Your email" required>
+            <button type="submit" class="newsletter-button">Join</button>
+          </form>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 NextStep. All rights reserved.</p>
+        <div class="footer-bottom-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Accessibility</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="auth-check.js"></script>
+  <script type="module" src="leaderboard.js"></script>
+  <script src="dark-mode.js"></script>
+  <script src="mobile-nav.js"></script>
+
+  </body>
+</html>
