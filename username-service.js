@@ -3,7 +3,7 @@ import {
   doc,
   runTransaction,
   serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 function usernameBase(name) {
   const cleaned = String(name || "")
