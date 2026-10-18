@@ -1,3 +1,9 @@
+import {
+  ensureUsername
+} from "./username-service.js";
+import {
+  getFirestore
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import {
   getAuth,
@@ -23,11 +29,13 @@ const firebaseConfig = {
 // Initialize Firebase
 let app;
 let auth;
+let db;
 let googleProvider;
 
 try {
   app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
   auth = getAuth(app);
+  db = getFirestore(app);
   googleProvider = new GoogleAuthProvider();
   googleProvider.setCustomParameters({
     prompt: 'select_account'
@@ -103,6 +111,31 @@ function getErrorMessage(code) {
   return messages[code] || `Error: ${code}. Please try again.`;
 }
 
+// Ensure signed-in members have usernames.
+// Never overwrite an existing username.
+async function assignUsernameIfNeeded(user) {
+  try {
+    const username = await ensureUsername(
+      db,
+      user,
+      user.displayName || ""
+    );
+
+    console.log(
+      'NextStep username:',
+      '@' + username
+    );
+
+  } catch (error) {
+    // Login should remain functional even if
+    // Firestore is temporarily unavailable.
+    console.error(
+      'Unable to verify username:',
+      error
+    );
+  }
+}
+
 // Flag to prevent double redirects
 let isRedirecting = false;
 
@@ -163,6 +196,7 @@ window.addEventListener('DOMContentLoaded', function () {
         console.log('Calling signInWithEmailAndPassword...');
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
+        await assignUsernameIfNeeded(user);
         console.log('Login successful!');
         console.log('User:', user.email);
         console.log('User ID:', user.uid);
@@ -210,6 +244,7 @@ window.addEventListener('DOMContentLoaded', function () {
         console.log('Opening Google popup...');
         const result = await signInWithPopup(auth, googleProvider);
         const user = result.user;
+        await assignUsernameIfNeeded(user);
         console.log('Google login successful!');
         console.log('User:', user.email);
         console.log('User ID:', user.uid);
