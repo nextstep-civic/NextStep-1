@@ -1,6 +1,9 @@
 import {
   ensureUsername
 } from "./username-service.js";
+import {
+  getFirestore
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import {
   getAuth,
@@ -28,11 +31,13 @@ const firebaseConfig = {
 // Initialize Firebase
 let app;
 let auth;
+let db;
 let googleProvider;
 
 try {
   app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
   auth = getAuth(app);
+  db = getFirestore(app);
   googleProvider = new GoogleAuthProvider();
   googleProvider.setCustomParameters({
     prompt: 'select_account'
@@ -55,11 +60,7 @@ try {
 } catch (error) {
   console.error('Firebase initialization error:', error);
 }
-await ensureUsername(
-  db,
-  userCredential.user,
-  fullName
-);
+
 // Show message function
 function showMessage(message, type) {
   console.log('Showing message:', type, message);
@@ -192,6 +193,7 @@ window.addEventListener('DOMContentLoaded', function () {
         // Set display name
         await updateProfile(user, { displayName: name });
 
+        
         // Create member record in Firestore
         try {
           await syncMemberRecord(user);
@@ -199,6 +201,31 @@ window.addEventListener('DOMContentLoaded', function () {
         } catch (syncError) {
           console.warn('Member record sync failed:', syncError);
         }
+
+        // Automatically assign a unique username.
+        // Existing usernames are preserved.
+        try {
+          const username = await ensureUsername(
+            db,
+            user,
+            name
+          );
+
+          console.log(
+            'NextStep username assigned:',
+            '@' + username
+          );
+
+        } catch (usernameError) {
+          // The Firebase account already exists.
+          // Do not create another account or delete it.
+          // Username assignment can be retried at login.
+          console.error(
+            'Username assignment failed:',
+            usernameError
+          );
+        }
+
 
         showMessage(`Welcome to NextStep, ${name}!`, 'success');
 
@@ -254,6 +281,27 @@ window.addEventListener('DOMContentLoaded', function () {
         } catch (syncError) {
           console.warn('Member record sync failed:', syncError);
         }
+        
+        // Automatically assign a unique username.
+        try {
+          const username = await ensureUsername(
+            db,
+            user,
+            user.displayName || ""
+          );
+
+          console.log(
+            'Google signup username:',
+            '@' + username
+          );
+
+        } catch (usernameError) {
+          console.error(
+            'Google username assignment failed:',
+            usernameError
+          );
+        }
+
 
         showMessage(`Welcome, ${user.displayName || 'User'}!`, 'success');
 
