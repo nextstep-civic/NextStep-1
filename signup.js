@@ -1,3 +1,6 @@
+import {
+  ensureUsername
+} from "./username-service.js";
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import {
   getAuth,
@@ -52,7 +55,11 @@ try {
 } catch (error) {
   console.error('Firebase initialization error:', error);
 }
-
+await ensureUsername(
+  db,
+  userCredential.user,
+  fullName
+);
 // Show message function
 function showMessage(message, type) {
   console.log('Showing message:', type, message);
